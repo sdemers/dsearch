@@ -1,1 +1,3 @@
-redo-ifchange dsearch.a
+. ./config.sh
+
+redo-ifchange dsearch.a ${GEOMD}/geomd.a

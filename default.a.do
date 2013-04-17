@@ -2,4 +2,4 @@
 
 redo-ifchange ${SRCS}
 
-${DMD} ${SRCS} -I.. -lib -of$3
+${DMD} ${SRCS} -w -I.. -lib -of$3

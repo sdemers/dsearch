@@ -9,6 +9,7 @@ import geomd.utils;
 import dsearch.graph;
 import dsearch.edge;
 import dsearch.node;
+import dsearch.searchEdge;
 import std.container;
 import std.algorithm;
 import std.functional;
@@ -43,7 +44,7 @@ class UniformCostSearch
         foreach (const Edge e; firstFrontier)
         {
             writeln(e);
-            m_frontier ~= createSearchEdge(null, e);
+            m_frontier ~= new SearchEdge(null, e);
         }
 
         SearchEdge solution;
@@ -68,7 +69,7 @@ class UniformCostSearch
             }
             writeln("---");
 
-            sort!("a.m_cost < b.m_cost")(m_frontier);
+            sort!("a.cost < b.cost")(m_frontier);
 
             auto edge = popFront(m_frontier);
 
@@ -100,13 +101,13 @@ class UniformCostSearch
                 if (foundFrontier is null &&
                     foundExplored is null)
                 {
-                    m_frontier ~= createSearchEdge(edge, child);
+                    m_frontier ~= new SearchEdge(edge, child);
                     writeln("adding " ~ child.toString() ~ " to frontier");
                 }
                 else if (foundFrontier !is null &&
-                         foundFrontier.m_pathCost > edge.m_cost + child.weight)
+                         foundFrontier.pathCost > edge.cost + child.weight)
                 {
-                    foundFrontier = createSearchEdge(edge, child);
+                    foundFrontier = new SearchEdge(edge, child);
                 }
             }
         }
@@ -117,20 +118,14 @@ class UniformCostSearch
             return empty;
         }
 
-        return solution.m_path;
-    }
-
-    private auto createSearchEdge(const SearchEdge parent, const Edge edge)
-    {
-        auto searchEdge = new SearchEdge(parent, edge);
-        return searchEdge;
+        return solution.path;
     }
 
     private auto findSearchEdge(SearchEdge[] se, const Edge e)
     {
         foreach (SearchEdge s; se)
         {
-            if (s.m_edge == e)
+            if (s.edge == e)
             {
                 return s;
             }
@@ -145,45 +140,6 @@ private:
 
     SearchEdge[]  m_frontier;
     SearchEdge[]  m_explored;
-}
-
-private class SearchEdge
-{
-    this(const SearchEdge parent, const Edge edge)
-    {
-        m_edge = edge;
-
-        if (parent is null)
-        {
-            m_path ~= edge;
-            m_cost = edge.weight;
-            m_pathCost = edge.weight;
-        }
-        else
-        {
-            m_path ~= parent.m_path ~ edge;
-            m_cost = edge.weight;
-            m_pathCost = parent.m_cost + edge.weight;
-        }
-    }
-
-    auto node2() { return m_edge.node2(); }
-
-    const(Edge)   m_edge;
-    const(Edge)[] m_path;
-    double        m_cost;
-    double        m_pathCost;
-
-    override string toString() const
-    {
-        string s = "SearchEdge: " ~ m_edge.node1.name ~ " -> " ~
-            m_edge.node2.name ~ " Cost: " ~ to!string(m_cost) ~ " Path: ";
-        foreach (const Edge e; m_path)
-        {
-            s ~= e.toString() ~ ", ";
-        }
-        return s;
-    }
 }
 
 unittest

@@ -104,7 +104,7 @@ class UniformCostSearch
                     writeln("adding " ~ child.toString() ~ " to frontier");
                 }
                 else if (foundFrontier !is null &&
-                         foundFrontier.m_cost > edge.m_cost + child.weight)
+                         foundFrontier.m_pathCost > edge.m_cost + child.weight)
                 {
                     foundFrontier = createSearchEdge(edge, child);
                 }

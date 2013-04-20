@@ -9,6 +9,7 @@ import dsearch.edge;
 import dsearch.node;
 
 import std.conv;
+import std.container;
 
 class SearchEdge
 {
@@ -54,3 +55,6 @@ private:
     double        m_cost;
     double        m_pathCost;
 }
+
+alias RedBlackTree!(SearchEdge, "a.cost < b.cost") SearchEdgeContainer;
+

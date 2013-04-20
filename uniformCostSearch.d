@@ -15,6 +15,7 @@ import std.algorithm;
 import std.functional;
 import std.stdio;
 import std.conv;
+import std.range;
 
 /**
     UniformCostSearch class
@@ -35,6 +36,9 @@ class UniformCostSearch
 
     auto run()
     {
+        auto frontier = new SearchEdgeContainer;
+        auto explored = new SearchEdgeContainer;
+
         // Add the first edges to frontier. We add only the edges that
         // are starting with the starting node.
         bool isStartingNode(const Edge e, const Node n) { return e.node1 == n; }
@@ -44,37 +48,34 @@ class UniformCostSearch
         foreach (const Edge e; firstFrontier)
         {
             writeln(e);
-            m_frontier ~= new SearchEdge(null, e);
+            auto se = new SearchEdge(null, e);
+            frontier.insert(se);
         }
 
         SearchEdge solution;
 
-        int i = 0;
         bool searching = true;
         while (searching)
         {
-            //if (++i > 2) break;
-
             writeln("---------");
-            if (m_frontier.length == 0)
+            if (frontier.length == 0)
             {
                 searching = false;
                 break;
             }
 
             writeln("Frontier: ");
-            foreach (const SearchEdge f; m_frontier)
+            foreach (const SearchEdge f; frontier)
             {
                 writeln(f.toString());
             }
             writeln("---");
 
-            sort!("a.cost < b.cost")(m_frontier);
-
-            auto edge = popFront(m_frontier);
+            auto edge = frontier[].front();
+            frontier.removeFront();
 
             writeln("Frontier after pop: ");
-            foreach (const SearchEdge f; m_frontier)
+            foreach (const SearchEdge f; frontier)
             {
                 writeln(f.toString());
             }
@@ -82,7 +83,7 @@ class UniformCostSearch
 
             writeln("visiting " ~ edge.node2().toString());
 
-            m_explored ~= edge;
+            explored.insert(edge);
 
             if (edge.node2() == m_goalNode)
             {
@@ -95,19 +96,21 @@ class UniformCostSearch
             {
                 writeln("child of " ~ edge.node2().toString() ~ ": " ~ child.toString());
 
-                auto foundFrontier = findSearchEdge(m_frontier, child);
-                auto foundExplored = findSearchEdge(m_explored, child);
+                auto foundFrontier = find(frontier[], child);
+                auto foundExplored = find(explored[], child);
 
-                if (foundFrontier is null &&
-                    foundExplored is null)
+                if (foundFrontier.empty &&
+                    foundExplored.empty)
                 {
-                    m_frontier ~= new SearchEdge(edge, child);
+                    frontier.insert(new SearchEdge(edge, child));
                     writeln("adding " ~ child.toString() ~ " to frontier");
                 }
-                else if (foundFrontier !is null &&
-                         foundFrontier.pathCost > edge.cost + child.weight)
+                else if (foundFrontier.empty == false &&
+                         foundFrontier.front().pathCost > edge.cost + child.weight)
+                         //foundFrontier.pathCost > edge.cost + child.weight)
                 {
-                    foundFrontier = new SearchEdge(edge, child);
+                    frontier.removeFront();
+                    frontier.insert(new SearchEdge(edge, child));
                 }
             }
         }
@@ -121,25 +124,10 @@ class UniformCostSearch
         return solution.path;
     }
 
-    private auto findSearchEdge(SearchEdge[] se, const Edge e)
-    {
-        foreach (SearchEdge s; se)
-        {
-            if (s.edge == e)
-            {
-                return s;
-            }
-        }
-        return null;
-    }
-
 private:
     const Graph m_graph;
     const Node  m_startingNode;
     const Node  m_goalNode;
-
-    SearchEdge[]  m_frontier;
-    SearchEdge[]  m_explored;
 }
 
 unittest

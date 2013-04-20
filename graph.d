@@ -95,7 +95,7 @@ protected:
 /**
     Applies a function on a graph and returns a new graph.
 */
-auto applyFunc(const ref Graph graph, void delegate(const ref Graph, ref Graph) func)
+auto applyFunc(const Graph graph, void delegate(const Graph, Graph) func)
 {
     auto newGraph = new Graph();
     func(graph, newGraph);

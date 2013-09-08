@@ -23,6 +23,7 @@ class Edge
     */
     this(Node n1,
          Node n2,
+         uint id,
          double weight,
          double radInitHeading,
          double radFinalHeading)
@@ -36,13 +37,19 @@ class Edge
         n1.addEdge(this);
     }
 
-    @property const(Node) node1() const  { return m_node1; }
-    @property const(Node) node2() const  { return m_node2; }
-    @property Node node1() { return m_node1; }
-    @property Node node2() { return m_node2; }
-    @property auto initHeading()  const { return m_radInitHeading; }
-    @property auto finalHeading() const { return m_radFinalHeading; }
-    @property auto weight()       const { return m_weight; }
+    const(Node) node1() const { return m_node1; }
+    const(Node) node2() const { return m_node2; }
+    Node node1()              { return m_node1; }
+    Node node2()              { return m_node2; }
+    auto initHeading()  const { return m_radInitHeading; }
+    auto finalHeading() const { return m_radFinalHeading; }
+    auto weight()       const { return m_weight; }
+
+    string name() const
+    {
+        string s = "[" ~ m_node1.name ~ "->" ~ m_node2.name ~ "]";
+        return s;
+    }
 
     override string toString() const
     {
@@ -51,7 +58,13 @@ class Edge
         return s;
     }
 
-private:
+    override bool opEquals(Object other)
+    {
+        Edge x = cast(Edge)other;
+        return x.m_node1 == m_node1 && x.m_node2 == m_node2;
+    }
+
+protected:
     Node m_node1;     /// Initial end
     Node m_node2;     /// Final end
     double m_weight;

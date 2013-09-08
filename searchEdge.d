@@ -11,6 +11,8 @@ import dsearch.node;
 import std.conv;
 import std.container;
 
+import std.stdio;
+
 class SearchEdge
 {
     this(const SearchEdge parent, const Edge edge)
@@ -27,19 +29,37 @@ class SearchEdge
         {
             m_path ~= parent.m_path ~ edge;
             m_cost = edge.weight;
-            m_pathCost = parent.m_cost + edge.weight;
+            m_pathCost = parent.m_pathCost + edge.weight;
         }
     }
 
-    @property const(Edge) edge() const   { return m_edge; }
-    @property const(Edge)[] path() const { return m_path; }
-    @property double cost() const        { return m_cost; }
-    @property double pathCost() const    { return m_pathCost; }
+    override bool opEquals(Object o)
+    {
+        SearchEdge x = cast(SearchEdge)o;
+        assert(x !is null);
+        return x.edge.node1.name == edge.node1.name &&
+               x.edge.node2.name == edge.node2.name;
+    }
 
-    @property auto node2() { return m_edge.node2(); }
+    override int opCmp(Object other)
+    {
+        SearchEdge x = cast(SearchEdge)other;
+        return cast(int)(pathCost - x.pathCost);
+    }
+
+    const(Edge) edge() const   { return m_edge; }
+    const(Edge)[] path() const { return m_path; }
+    double cost() const        { return m_cost; }
+    double pathCost() const    { return m_pathCost; }
+
+    auto node1() { return m_edge.node1; }
+    auto node2() { return m_edge.node2; }
 
     override string toString() const
     {
+        return m_edge.node2.name;
+
+/*
         string s = "SearchEdge: " ~ m_edge.node1.name ~ " -> " ~
             m_edge.node2.name ~ " Cost: " ~ to!string(m_cost) ~ " Path: ";
         foreach (const Edge e; m_path)
@@ -47,7 +67,9 @@ class SearchEdge
             s ~= e.toString() ~ ", ";
         }
         return s;
+*/
     }
+
 
 private:
     const(Edge)   m_edge;
@@ -56,5 +78,18 @@ private:
     double        m_pathCost;
 }
 
-alias RedBlackTree!(SearchEdge, "a.cost < b.cost") SearchEdgeContainer;
+//------------------------------------------------------------------------------
+//
+// Two functions: hack to avoid excessive copying by the compiler
+//
+bool lessFun(SearchEdge e1, SearchEdge e2)
+{
+    return e1.pathCost < e2.pathCost;
+}
 
+bool lessfun(T)(auto ref T a, auto ref T b)
+{
+    return a < b;
+}
+
+alias RedBlackTree!(SearchEdge, lessFun) SearchEdgeContainer;

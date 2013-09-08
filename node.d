@@ -22,20 +22,33 @@ class Node
         Constructor
     */
     this(string name,
+         uint id,
          Point2Dd pos)
     {
         m_name = name;
+        m_id = id;
         m_pos = pos;
     }
 
-    @property auto name() const
+    auto id() const
+    {
+        return m_id;
+    }
+
+    auto name() const
     {
         return m_name;
     }
 
-    @property auto pos() const
+    auto pos() const
     {
         return m_pos;
+    }
+
+    override bool opEquals(Object other)
+    {
+        Node x = cast(Node)other;
+        return x.m_id == m_id;
     }
 
     /**
@@ -74,6 +87,7 @@ class Node
 
 private:
     string   m_name;
+    uint     m_id;
     Point2Dd m_pos;
     Edge[]   m_edges; // outgoing edges
 }

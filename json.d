@@ -62,7 +62,8 @@ public auto loadJSON(const string filename)
         double cp2x = edge["cpx1"].floating;
         double cp2y = edge["cpy1"].floating;
 
-        edgeMap[id] = new BezierEdge(n1,
+        edgeMap[id] = new BezierEdge(cast(uint)id,
+                                     n1,
                                      new Node(n1.name ~ "_cp1", n1.id, new Point2Dd(cp1x, cp1y)),
                                      new Node(n2.name ~ "_cp2", n2.id, new Point2Dd(cp2x, cp2y)),
                                      n2);

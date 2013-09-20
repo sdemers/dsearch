@@ -33,6 +33,7 @@ class Edge
         m_weight          = weight;
         m_radInitHeading  = radInitHeading;
         m_radFinalHeading = radFinalHeading;
+        m_id              = id;
 
         n1.addEdge(this);
     }
@@ -61,7 +62,7 @@ class Edge
     override bool opEquals(Object other)
     {
         Edge x = cast(Edge)other;
-        return x.m_node1 == m_node1 && x.m_node2 == m_node2;
+        return x.m_id == m_id;
     }
 
 protected:
@@ -70,6 +71,7 @@ protected:
     double m_weight;
     double m_radInitHeading;
     double m_radFinalHeading;
+    uint   m_id;
 }
 
 public bool isStartingNode(ref Edge edge, ref Node node)

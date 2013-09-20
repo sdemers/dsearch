@@ -190,9 +190,9 @@ unittest
     auto n1 = new Node("n1", 1, p1);
     auto n2 = new Node("n2", 2, p2);
     auto n3 = new Node("n3", 3, p3);
-    auto e1 = new Edge(n1, n2, 1.0, degToRad!double(45), degToRad!double(45));
-    auto e2 = new Edge(n2, n3, 2.0, degToRad!double(90), degToRad!double(90));
-    auto e3 = new Edge(n1, n3, 4.0, degToRad!double(45), degToRad!double(90));
+    auto e1 = new Edge(n1, n2, 1, 1.0, degToRad!double(45), degToRad!double(45));
+    auto e2 = new Edge(n2, n3, 2, 2.0, degToRad!double(90), degToRad!double(90));
+    auto e3 = new Edge(n1, n3, 3, 4.0, degToRad!double(45), degToRad!double(90));
 
     auto edges = [e1, e2, e3];
     auto graph = new Graph;

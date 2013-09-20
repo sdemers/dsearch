@@ -23,7 +23,8 @@ class BezierEdge : Edge
     /**
         Constructor
     */
-    this(Node n1,
+    this(uint id,
+         Node n1,
          Node cp1,
          Node cp2,
          Node n2)
@@ -33,7 +34,7 @@ class BezierEdge : Edge
 
         m_curve = new BezierCurve(n1.pos, cp1.pos, cp2.pos, n2.pos);
 
-        super(n1, n2, m_curve.length, m_curve.initHeading, m_curve.finalHeading);
+        super(n1, n2, id, m_curve.length, m_curve.initHeading, m_curve.finalHeading);
     }
 
     const(Node) cp1() const { return m_cp1; }

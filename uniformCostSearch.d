@@ -10,6 +10,7 @@ import dsearch.graph;
 import dsearch.edge;
 import dsearch.node;
 import dsearch.searchEdge;
+import dsearch.searchEdgeContainer;
 import std.container;
 import std.algorithm;
 import std.functional;
@@ -48,8 +49,8 @@ class UniformCostSearch
         StopWatch sw;
         sw.start();
 
-        SearchEdgeContainer frontier = new SearchEdgeContainer;
-        SearchEdgeContainer explored = new SearchEdgeContainer;
+        ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length);
+        ISearchEdgeContainer explored = new FixedArrayContainer(m_graph.edges.length);
 
         // Add the first edges to frontier. We add only the edges that
         // are starting with the starting node.
@@ -73,12 +74,12 @@ class UniformCostSearch
         {
             debug
             {
-                debugPrint("Frontier:");
-                foreach (const SearchEdge e; frontier)
-                {
-                    write(e.edge.name);
-                }
-                writeln();
+                //debugPrint("Frontier:");
+                //foreach (const SearchEdge e; frontier)
+                //{
+                    //write(e.edge.name);
+                //}
+                //writeln();
             }
 
             if (0)//++i == 100)
@@ -93,10 +94,11 @@ class UniformCostSearch
                 break;
             }
 
-            auto searchEdge = frontier[].front;
-            frontier.removeFront;
+            auto searchEdge = frontier.getLowestCostEdge;
+            frontier.remove(searchEdge);
 
             debugPrint("Exploring: " ~ searchEdge.edge.name);
+            debugPrint("Exploring: " ~ to!string(searchEdge.edge.id));
             explored.insert(searchEdge);
 
             debug
@@ -119,12 +121,12 @@ class UniformCostSearch
 
             debug
             {
-                debugPrint("Explored:");
-                foreach (const SearchEdge e; explored[])
-                {
-                    write(e.edge.name ~ " ");
-                }
-                writeln();
+                //debugPrint("Explored:");
+                //foreach (const SearchEdge e; explored[])
+                //{
+                    //write(e.edge.name ~ " ");
+                //}
+                //writeln();
             }
 
             foreach (const Edge child; searchEdge.node2.edges)
@@ -137,20 +139,20 @@ class UniformCostSearch
 
                 debugPrint("child of " ~ searchEdge.edge.name ~ ": " ~ child.name);
 
-                auto foundFrontier = find!("a.edge == b")(frontier[], child);
-                auto foundExplored = find!("a.edge == b")(explored[], child);
+                auto foundFrontier = frontier.find(child);
+                auto foundExplored = explored.find(child);
 
-                if (foundFrontier.empty &&
-                    foundExplored.empty)
+                if (foundFrontier is null &&
+                    foundExplored is null)
                 {
                     auto se = new SearchEdge(searchEdge, child);
                     debugPrint("1 adding " ~ child.name ~ " to frontier, pathCost: " ~ to!string(se.pathCost));
-                    //debugPrint("old frontier.length: ", frontier.length);
+                    debugPrint("old frontier.length: ", frontier.length);
                     frontier.insert(se);
-                    //debugPrint("new frontier.length: ", frontier.length);
+                    debugPrint("new frontier.length: ", frontier.length);
                 }
-                else if (foundFrontier.empty == false &&
-                         foundFrontier.front.pathCost > searchEdge.pathCost + child.weight)
+                else if (foundFrontier !is null &&
+                         foundFrontier.pathCost > searchEdge.pathCost + child.weight)
                 {
                     frontier.remove(foundFrontier);
                     auto se = new SearchEdge(searchEdge, child);

@@ -102,10 +102,14 @@ unittest
     auto search = new UniformCostSearch(g, n1[0], n2[0]);
     auto result = search.run();
 
-    foreach (const Edge e; result)
-    {
-        writefln("%.2f, %.2f length: %.2f", e.node2.pos.x, e.node2.pos.y, e.weight);
-    }
-    writeln(result);
+	debug
+	{
+		foreach (const Edge e; result)
+		{
+			writefln("%.2f, %.2f length: %.2f", e.node2.pos.x, e.node2.pos.y, e.weight);
+		}
+		writeln(result);
+	}
+
     writeln("========================== END JSON ========================");
 }

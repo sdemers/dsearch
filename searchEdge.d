@@ -37,8 +37,7 @@ class SearchEdge
     {
         SearchEdge x = cast(SearchEdge)o;
         assert(x !is null);
-        return x.edge.node1.name == edge.node1.name &&
-               x.edge.node2.name == edge.node2.name;
+        return x.edge.id == edge.id;
     }
 
     override int opCmp(Object other)

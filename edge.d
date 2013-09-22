@@ -65,6 +65,11 @@ class Edge
         return x.m_id == m_id;
     }
 
+    uint id() const
+    {
+        return m_id;
+    }
+
 protected:
     Node m_node1;     /// Initial end
     Node m_node2;     /// Final end

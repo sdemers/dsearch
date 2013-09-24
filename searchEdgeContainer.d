@@ -11,25 +11,45 @@ import std.container;
 import std.stdio;
 import std.conv;
 
+
+/**
+    Interface for search edge containers.
+*/
 interface ISearchEdgeContainer
 {
     void insert(SearchEdge e);
     void remove(SearchEdge e);
     SearchEdge find(const Edge e);
     SearchEdge find(const SearchEdge e);
+
+    /**
+        Returns the length of the container, i.e. the number of valid SearchEdge
+        contained in it.
+    */
     uint length() const;
-    SearchEdge getLowestCostEdge();
+
+    /**
+        Returns the next SearchEdge according to an heuristic
+    */
+    SearchEdge getNextEdgeToVisit();
 };
 
-
-//------------------------------------------------------------------------------
-//
+/**
+    Class that implements ISearchEdgeContainer using a statically sized array
+*/
 class FixedArrayContainer : DynArrayContainer
 {
 public:
 
-    this(ulong size)
+    /**
+        Constructor
+            Params:
+            size = array size
+    */
+    this(ulong size,
+         bool delegate(SearchEdge, SearchEdge) heuristic)
     {
+        super(heuristic);
         m_container = new SearchEdge[size];
     }
 
@@ -40,7 +60,7 @@ public:
             m_container[e.edge.id] = e;
             ++m_nbElem;
 
-            setLowestCostOnInsert(e);
+            setNextToVisitOnInsert(e);
         }
     }
 
@@ -50,14 +70,16 @@ public:
     }
 };
 
-//------------------------------------------------------------------------------
-//
+/**
+  Class that implements ISearchEdgeContainer using a dynamically sized array
+ */
 class DynArrayContainer : ISearchEdgeContainer
 {
 public:
 
-    this()
+    this(bool delegate(SearchEdge, SearchEdge) heuristic)
     {
+        m_heuristic = heuristic;
         m_container = new SearchEdge[500];
     }
 
@@ -77,29 +99,14 @@ public:
             m_container = newArray;
 
             ++m_nbElem;
-            setLowestCostOnInsert(e);
+            setNextToVisitOnInsert(e);
         }
         else if (m_container[e.edge.id] is null)
         {
             m_container[e.edge.id] = e;
 
             ++m_nbElem;
-            setLowestCostOnInsert(e);
-        }
-
-        debug
-        {
-            writefln("ArrayContainer insert id: %d, length: %d, size: %d",
-                     e.edge.id, m_nbElem, m_container.length);
-        }
-    }
-
-    protected void setLowestCostOnInsert(SearchEdge e)
-    {
-        if (m_lowestCost is null ||
-            e.pathCost < m_lowestCost.pathCost)
-        {
-            m_lowestCost = e;
+            setNextToVisitOnInsert(e);
         }
     }
 
@@ -113,7 +120,7 @@ public:
         m_container[e.edge.id] = null;
         --m_nbElem;
 
-        setLowestCostOnRemove(e);
+        setEdgeToVisitOnRemove(e);
     }
 
     SearchEdge find(const SearchEdge e)
@@ -136,23 +143,27 @@ public:
         return m_nbElem;
     }
 
-    SearchEdge getLowestCostEdge()
+    SearchEdge getNextEdgeToVisit()
     {
-        debug
-        {
-            writefln("getLowestCostEdge: %d", m_lowestCost.edge.id);
-        }
-
-        return m_lowestCost;
+        return m_nextEdgeToVisit;
     }
 
-    protected void setLowestCostOnRemove(SearchEdge edge)
+    protected void setNextToVisitOnInsert(SearchEdge e)
     {
-        assert(m_lowestCost !is null);
-
-        if (edge == m_lowestCost)
+        if (m_nextEdgeToVisit is null ||
+            m_heuristic(e, m_nextEdgeToVisit))
         {
-            m_lowestCost = null;
+            m_nextEdgeToVisit = e;
+        }
+    }
+
+    protected void setEdgeToVisitOnRemove(SearchEdge edge)
+    {
+        assert(m_nextEdgeToVisit !is null);
+
+        if (edge == m_nextEdgeToVisit)
+        {
+            m_nextEdgeToVisit = null;
 
             foreach (SearchEdge e; m_container)
             {
@@ -161,14 +172,10 @@ public:
                     continue;
                 }
 
-                if (m_lowestCost is null ||
-                    e.pathCost < m_lowestCost.pathCost)
+                if (m_nextEdgeToVisit is null ||
+                    m_heuristic(e, m_nextEdgeToVisit))
                 {
-                    debug
-                    {
-                        writefln("setLowestCostOnRemove: new lowest cost %d", e.edge.id);
-                    }
-                    m_lowestCost = e;
+                    m_nextEdgeToVisit = e;
                 }
             }
         }
@@ -177,5 +184,7 @@ public:
 protected:
     SearchEdge[] m_container;
     uint         m_nbElem = 0;
-    SearchEdge   m_lowestCost = null;
+    SearchEdge   m_nextEdgeToVisit = null;
+
+    bool delegate(SearchEdge, SearchEdge) m_heuristic;
 };

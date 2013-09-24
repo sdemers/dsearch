@@ -57,16 +57,6 @@ class SearchEdge
     override string toString() const
     {
         return m_edge.node2.name;
-
-/*
-        string s = "SearchEdge: " ~ m_edge.node1.name ~ " -> " ~
-            m_edge.node2.name ~ " Cost: " ~ to!string(m_cost) ~ " Path: ";
-        foreach (const Edge e; m_path)
-        {
-            s ~= e.toString() ~ ", ";
-        }
-        return s;
-*/
     }
 
 
@@ -90,5 +80,3 @@ bool lessfun(T)(auto ref T a, auto ref T b)
 {
     return a < b;
 }
-
-alias RedBlackTree!(SearchEdge, lessFun) SearchEdgeContainer;

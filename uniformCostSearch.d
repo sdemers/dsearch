@@ -49,8 +49,13 @@ class UniformCostSearch
         StopWatch sw;
         sw.start();
 
-        ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length);
-        ISearchEdgeContainer explored = new FixedArrayContainer(m_graph.edges.length);
+        bool lowestCost(SearchEdge e1, SearchEdge e2)
+        {
+            return e1.pathCost < e2.pathCost;
+        }
+
+        ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length, &lowestCost);
+        ISearchEdgeContainer explored = new FixedArrayContainer(m_graph.edges.length, &lowestCost);
 
         // Add the first edges to frontier. We add only the edges that
         // are starting with the starting node.
@@ -94,7 +99,7 @@ class UniformCostSearch
                 break;
             }
 
-            auto searchEdge = frontier.getLowestCostEdge;
+            auto searchEdge = frontier.getNextEdgeToVisit;
             frontier.remove(searchEdge);
 
             debugPrint("Exploring: " ~ searchEdge.edge.name);

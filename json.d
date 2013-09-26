@@ -7,6 +7,7 @@ module dsearch.json;
 
 import dsearch.edge;
 import dsearch.bezierEdge;
+import dsearch.lineSegmentEdge;
 import dsearch.node;
 import dsearch.graph;
 import geomd.point2d;
@@ -44,7 +45,7 @@ public auto loadJSON(const string filename)
         nodeMap[id] = new Node(name, cast(uint)id, pt);
     }
 
-    BezierEdge[long] edgeMap;
+    Edge[long] edgeMap;
     foreach (edgeJson; edges)
     {
         JSONValue[string] edge = edgeJson.object;
@@ -57,20 +58,32 @@ public auto loadJSON(const string filename)
         Node n1 = nodeMap[node1];
         Node n2 = nodeMap[node2];
 
-        double cp1x = edge["cpx0"].floating;
-        double cp1y = edge["cpy0"].floating;
-        double cp2x = edge["cpx1"].floating;
-        double cp2y = edge["cpy1"].floating;
+        switch (edge["type"].str)
+        {
+            case "bezier":
+                double cp1x = edge["cpx0"].floating;
+                double cp1y = edge["cpy0"].floating;
+                double cp2x = edge["cpx1"].floating;
+                double cp2y = edge["cpy1"].floating;
 
-        edgeMap[id] = new BezierEdge(cast(uint)id,
-                                     n1,
-                                     new Node(n1.name ~ "_cp1", n1.id, new Point2Dd(cp1x, cp1y)),
-                                     new Node(n2.name ~ "_cp2", n2.id, new Point2Dd(cp2x, cp2y)),
-                                     n2);
+                edgeMap[id] = new BezierEdge(cast(uint)id,
+                                             n1,
+                                             new Node(n1.name ~ "_cp1", n1.id, new Point2Dd(cp1x, cp1y)),
+                                             new Node(n2.name ~ "_cp2", n2.id, new Point2Dd(cp2x, cp2y)),
+                                             n2);
+                break;
+
+            case "line":
+                edgeMap[id] = new LineSegmentEdge(cast(uint)id, n1, n2);
+                break;
+
+            default:
+                break;
+        }
     }
 
     auto graph = new Graph();
-    foreach (BezierEdge edge; edgeMap)
+    foreach (Edge edge; edgeMap)
     {
         Edge e = cast(Edge)edge;
         graph.addEdge(e);
@@ -84,17 +97,17 @@ unittest
 {
     import dsearch.uniformCostSearch;
 
-    writeln("========================== JSON ========================");
+    writeln("Begin JSON test");
 
-    Graph g = loadJSON("data/KORD.json");
+    Graph g = loadJSON("data/lines.json");
 
     foreach (const Node n; g.nodes)
     {
         //writefln("%.2f, %.2f |", n.pos.x, n.pos.y);
     }
 
-    auto n1 = find!("a.name == \"14L1C\"")(g.nodes);
-    auto n2 = find!("a.name == \"04R1C\"")(g.nodes);
+    auto n1 = find!("a.name == \"0\"")(g.nodes);
+    auto n2 = find!("a.name == \"3\"")(g.nodes);
 
     writeln(n1[0]);
     writeln(n2[0]);
@@ -104,6 +117,7 @@ unittest
 
 	debug
 	{
+        writeln("JSON result:");
 		foreach (const Edge e; result)
 		{
 			writefln("%.2f, %.2f length: %.2f", e.node2.pos.x, e.node2.pos.y, e.weight);
@@ -111,5 +125,5 @@ unittest
 		writeln(result);
 	}
 
-    writeln("========================== END JSON ========================");
+    writeln("End JSON test");
 }

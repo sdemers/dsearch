@@ -1,0 +1,15 @@
+{"data":{"nodes":[
+{"id": 0, "name": "0", "x": 375.50000, "y": 110.00000},
+{"id": 1, "name": "1", "x": 218.80005, "y": 139.00000},
+{"id": 2, "name": "2", "x": 105.40002, "y": 142.00000},
+{"id": 3, "name": "3", "x": 205.40002, "y": 200.00000}
+],"edges": [
+{"id": 0, "type": "line", "name": "0_1", "node1": 0, "node2": 1},
+{"id": 1, "type": "line", "name": "1_0", "node1": 1, "node2": 0},
+{"id": 2, "type": "line", "name": "0_2", "node1": 0, "node2": 2},
+{"id": 3, "type": "line", "name": "2_0", "node1": 2, "node2": 0},
+{"id": 4, "type": "line", "name": "0_2", "node1": 1, "node2": 2},
+{"id": 5, "type": "line", "name": "2_0", "node1": 2, "node2": 1},
+{"id": 6, "type": "line", "name": "2_3", "node1": 2, "node2": 3},
+{"id": 7, "type": "line", "name": "3_2", "node1": 3, "node2": 2}
+]}}

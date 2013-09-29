@@ -118,5 +118,8 @@ unittest
     g1.addEdge(e1).addEdge(e2).addEdge(e3);
     check!ulong(g1.edges.length, cast(ulong)3);
 
-    writeln(g1.toString());
+    debug
+    {
+        writeln(g1.toString());
+    }
 }

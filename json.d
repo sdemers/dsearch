@@ -101,13 +101,16 @@ unittest
 
     Graph g = loadJSON("data/lines.json");
 
-    foreach (const Node n; g.nodes)
+    debug
     {
-        //writefln("%.2f, %.2f |", n.pos.x, n.pos.y);
+        foreach (const Node n; g.nodes)
+        {
+            writefln("%.2f, %.2f |", n.pos.x, n.pos.y);
+        }
     }
 
-    auto n1 = find!("a.name == \"0\"")(g.nodes);
-    auto n2 = find!("a.name == \"3\"")(g.nodes);
+    auto n1 = find!("a.name == \"1055\"")(g.nodes);
+    auto n2 = find!("a.name == \"547\"")(g.nodes);
 
     writeln(n1[0]);
     writeln(n2[0]);

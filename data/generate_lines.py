@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import json
 import numpy as np
+import sys
 
 class Point:
     def __init__(self, id, x=0, y=0):
@@ -31,9 +31,19 @@ def findClosests(points):
     closests = []
     for p in points:
         c = sortByDistance(p, points)
-        # closests.append((p, (c[0], c[1], c[2])))
-        closests.append((p, (c[0], c[1])))
+        closests.append((p, (c[0], c[1], c[2])))
+        #closests.append((p, (c[0], c[1])))
     return closests
+
+def outputLine(id, p0, p1, end=',\n'):
+    out = '{{"id": {0}, "type": "line", "name": "{1}_{2}", "node1": {3}, "node2": {4}}}'\
+            .format(id, p0.id, p1.id, p0.id, p1.id)
+    sys.stdout.write(out)
+    sys.stdout.write(end)
+
+def outputLineCoord(p0, p1):
+    out = '{0} {1}, {2} {3}|\n'.format(p0.x, p0.y, p1.x, p1.y)
+    sys.stdout.write(out)
 
 ################## Main ####################
 
@@ -51,22 +61,36 @@ cl = findClosests(points)
 print """{"data":{"nodes":["""
 for i in xrange(len(points)):
     p = points[i]
+    out = '{{"id": {0}, "name": "{0}", "x": {1}.00, "y": {2}.00}}'.format(p.id, p.x, p.y)
+    sys.stdout.write(out)
     if i == len(points) - 1:
-        print '{"id": %d, "name": "%d", "x": %.2f, "y": %.2f}' % (p.id, p.id, p.x, p.y)
+        sys.stdout.write('\n')
     else:
-        print '{"id": %d, "name": "%d", "x": %.2f, "y": %.2f},' % (p.id, p.id, p.x, p.y)
+        sys.stdout.write(',\n')
 
 print """],"edges": ["""
 
+lines = []
 id = 0
 for i in xrange(len(cl)):
     (p, c) = cl[i]
     for j in xrange(len(c)):
         p1 = c[j]
+        end = ',\n'
         if i == len(cl) - 1 and j == len(c) - 1:
-            print '{"id": %d, "type": "line", "name": "%d_%d", "node1": %d, "node2": %d}' % (id, p.id, p1.id, p.id, p1.id)
-        else:
-            print '{"id": %d, "type": "line", "name": "%d_%d", "node1": %d, "node2": %d},' % (id, p.id, p1.id, p.id, p1.id)
-        id = id + 1
+            end = '\n'
+        line_name = '{0}_{1}'.format(p.id, p1.id)
+        if line_name not in lines:
+            lines.append(line_name)
+            outputLine(id, p, p1, end)
+            #outputLineCoord(p, p1)
+            id = id + 1
+
+        line_name = '{0}_{1}'.format(p1.id, p.id)
+        if line_name not in lines:
+            lines.append(line_name)
+            outputLine(id, p1, p, end)
+            #outputLineCoord(p1, p)
+            id = id + 1
 
 print "]}}"

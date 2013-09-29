@@ -77,22 +77,6 @@ class UniformCostSearch
         bool searching = true;
         while (searching)
         {
-            debug
-            {
-                //debugPrint("Frontier:");
-                //foreach (const SearchEdge e; frontier)
-                //{
-                    //write(e.edge.name);
-                //}
-                //writeln();
-            }
-
-            if (0)//++i == 100)
-            {
-                searching = false;
-                break;
-            }
-
             if (frontier.length == 0)
             {
                 searching = false;
@@ -122,16 +106,6 @@ class UniformCostSearch
                 solution = searchEdge;
                 searching = false;
                 break;
-            }
-
-            debug
-            {
-                //debugPrint("Explored:");
-                //foreach (const SearchEdge e; explored[])
-                //{
-                    //write(e.edge.name ~ " ");
-                //}
-                //writeln();
             }
 
             foreach (const Edge child; searchEdge.node2.edges)

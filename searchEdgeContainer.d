@@ -21,6 +21,7 @@ interface ISearchEdgeContainer
     void remove(SearchEdge e);
     SearchEdge find(const Edge e);
     SearchEdge find(const SearchEdge e);
+    void clear();
 
     /**
         Returns the length of the container, i.e. the number of valid SearchEdge
@@ -141,6 +142,14 @@ public:
     uint length() const
     {
         return m_nbElem;
+    }
+
+    void clear()
+    {
+        m_nbElem = 0;
+        size_t size = m_container.length;
+        m_container = new SearchEdge[size];
+        m_nextEdgeToVisit = null;
     }
 
     SearchEdge getNextEdgeToVisit()

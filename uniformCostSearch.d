@@ -17,7 +17,6 @@ import std.functional;
 import std.stdio;
 import std.conv;
 import std.range;
-import std.datetime;
 
 void debugPrint(S...)(S args)
 {
@@ -46,9 +45,6 @@ class UniformCostSearch
 
     const(Edge)[] run()
     {
-        StopWatch sw;
-        sw.start();
-
         bool lowestCost(SearchEdge e1, SearchEdge e2)
         {
             return e1.pathCost < e2.pathCost;
@@ -140,9 +136,6 @@ class UniformCostSearch
                 }
             }
         }
-
-        sw.stop();
-        writefln("Time elapsed: %s msec", sw.peek().msecs);
 
         if (solution is null)
         {

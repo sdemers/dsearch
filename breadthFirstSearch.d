@@ -3,7 +3,7 @@ Copyright: Serge Demers 2013
 License: <a href="http://www.boost.org/LICENSE_1_0.txt">Boost License 1.0</a>.
 */
 
-module dsearch.uniformCostSearch;
+module dsearch.breadthFirstSearch;
 
 import geomd.utils;
 import dsearch.graph;
@@ -18,18 +18,10 @@ import std.stdio;
 import std.conv;
 import std.range;
 
-void debugPrint(S...)(S args)
-{
-    debug
-    {
-        writeln(args);
-    }
-}
-
 /**
-    UniformCostSearch class
+    Breadth First Search class
 */
-class UniformCostSearch
+class BreadthFirstSearch
 {
     /**
         Constructor
@@ -45,12 +37,14 @@ class UniformCostSearch
 
     const(Edge)[] run()
     {
-        bool lowestCost(SearchEdge e1, SearchEdge e2)
+        bool shallowest(SearchEdge e1, SearchEdge e2)
         {
-            return e1.pathCost < e2.pathCost;
+            auto be1 = cast(BreadthFirstSearchEdge)e1;
+            auto be2 = cast(BreadthFirstSearchEdge)e2;
+            return be1.depth < be2.depth;
         }
 
-        ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length, &lowestCost);
+        ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length, &shallowest);
         ISearchEdgeContainer explored = new FixedArrayContainer(m_graph.edges.length, null);
 
         // Add the first edges to frontier. We add only the edges that
@@ -59,9 +53,10 @@ class UniformCostSearch
 
         foreach (const Edge e; firstFrontier)
         {
-            auto se = new SearchEdge(null, e);
-            frontier.insert(se);
+            frontier.insert(new BreadthFirstSearchEdge(null, e, 0));
         }
+
+        BreadthFirstSearchEdge solution;
 
         bool searching = true;
         while (searching)
@@ -72,8 +67,9 @@ class UniformCostSearch
                 break;
             }
 
-            auto searchEdge = frontier.getNextEdgeToVisit;
+            auto searchEdge = cast(BreadthFirstSearchEdge)frontier.getNextEdgeToVisit;
             frontier.remove(searchEdge);
+
             explored.insert(searchEdge);
 
             if (searchEdge.node2 == m_goalNode)
@@ -89,13 +85,8 @@ class UniformCostSearch
                 if (foundFrontier is null &&
                     foundExplored is null)
                 {
-                    frontier.insert(new SearchEdge(searchEdge, child));
-                }
-                else if (foundFrontier !is null &&
-                         foundFrontier.pathCost > searchEdge.pathCost + child.weight)
-                {
-                    frontier.remove(foundFrontier);
-                    frontier.insert(new SearchEdge(searchEdge, child));
+                    auto se = new BreadthFirstSearchEdge(searchEdge, child, searchEdge.depth + 1);
+                    frontier.insert(se);
                 }
             }
         }
@@ -110,28 +101,27 @@ private:
     const Node  m_goalNode;
 }
 
+/**
+    Search edge class that also include the current depth
+*/
+private class BreadthFirstSearchEdge : SearchEdge
+{
+    this(const SearchEdge parent, const Edge edge, ulong depth)
+    {
+        super(parent, edge);
+        m_depth = depth;
+    }
+
+    auto depth() const
+    {
+        return m_depth;
+    }
+
+private:
+    ulong m_depth;
+}
+
+
 unittest
 {
-    import geomd.utils;
-    import std.stdio;
-    import geomd.point2d;
-
-    auto p1 = new Point2Dd(0.0, 0.0);
-    auto p2 = new Point2Dd(1.0, 1.0);
-    auto p3 = new Point2Dd(0.0, 1.0);
-    auto n1 = new Node("n1", 1, p1);
-    auto n2 = new Node("n2", 2, p2);
-    auto n3 = new Node("n3", 3, p3);
-    auto e1 = new Edge(n1, n2, 1, 1.0, degToRad!double(45), degToRad!double(45));
-    auto e2 = new Edge(n2, n3, 2, 2.0, degToRad!double(90), degToRad!double(90));
-    auto e3 = new Edge(n1, n3, 3, 4.0, degToRad!double(45), degToRad!double(90));
-
-    auto edges = [e1, e2, e3];
-    auto graph = new Graph;
-    graph.addEdges(edges);
-
-    auto search = new UniformCostSearch(graph, n1, n3);
-    //auto result = search.run();
-    //writeln("uniformCostSearch unittest result: ");
-    //writeln(result);
 }

@@ -113,11 +113,6 @@ public:
 
     void remove(SearchEdge e)
     {
-        debug
-        {
-            writefln("remove: %d", e.edge.id);
-        }
-
         m_container[e.edge.id] = null;
         --m_nbElem;
 
@@ -159,6 +154,11 @@ public:
 
     protected void setNextToVisitOnInsert(SearchEdge e)
     {
+        if (m_heuristic is null)
+        {
+            return;
+        }
+
         if (m_nextEdgeToVisit is null ||
             m_heuristic(e, m_nextEdgeToVisit))
         {
@@ -168,6 +168,11 @@ public:
 
     protected void setEdgeToVisitOnRemove(SearchEdge edge)
     {
+        if (m_heuristic is null)
+        {
+            return;
+        }
+
         assert(m_nextEdgeToVisit !is null);
 
         if (edge == m_nextEdgeToVisit)

@@ -53,8 +53,6 @@ class DepthLimitedSearch
 
         auto firstChilds = m_graph.edges.filter!(a => a.node1 == currentNode);
 
-        debug { writefln("firstChilds size: %d", firstChilds.walkLength); }
-
         auto firstEdges = firstChilds.map!(a => new SearchEdge(null, a));
 
         foreach (SearchEdge e; firstEdges)

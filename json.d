@@ -98,6 +98,7 @@ unittest
 {
     import dsearch.uniformCostSearch;
     import dsearch.depthLimitedSearch;
+    import dsearch.breadthFirstSearch;
 
     writeln("Begin JSON test");
 
@@ -114,36 +115,49 @@ unittest
     auto n1 = find!("a.name == \"1055\"")(g.nodes);
     auto n2 = find!("a.name == \"547\"")(g.nodes);
 
-    debug
-    {
-        writeln(n1[0]);
-        writeln(n2[0]);
-    }
 
     StopWatch sw;
     sw.start();
 
-    writeln("Uniform cost search -------------------------------");
+    writeln("Uniform Cost Search -------------------------------");
 
-    auto search = new UniformCostSearch(g, n1[0], n2[0]);
-    auto result = search.run();
+    auto ucs = new UniformCostSearch(g, n1[0], n2[0]);
+    auto ucsResult = ucs.run();
 
 	debug
 	{
         writeln("JSON result:");
-		foreach (const Edge e; result)
+		foreach (const Edge e; ucsResult)
 		{
-			writefln("%.2f, %.2f length: %.2f", e.node2.pos.x, e.node2.pos.y, e.weight);
+			writefln("%.2f, %.2f", e.node2.pos.x, e.node2.pos.y);
 		}
-		writeln(result);
 	}
 
     sw.stop();
     writefln("Time elapsed: %s msec", sw.peek().msecs);
-
-    writeln("Limited depth search -------------------------------");
-
     sw.reset();
+
+    writeln("Breadth First Search -------------------------------");
+
+    sw.start();
+    auto bfs = new BreadthFirstSearch(g, n1[0], n2[0]);
+    auto bfsResult = bfs.run();
+
+	debug
+	{
+        writeln("JSON result:");
+		foreach (const Edge e; bfsResult)
+		{
+			writefln("%.2f, %.2f", e.node2.pos.x, e.node2.pos.y);
+		}
+	}
+
+    sw.stop();
+    writefln("Time elapsed: %s msec", sw.peek().msecs);
+    sw.reset();
+
+    writeln("Depth Limited Search -------------------------------");
+
     sw.start();
 
     auto dls = new DepthLimitedSearch(g, n1[0], n2[0]);

@@ -8,6 +8,8 @@ The code is released under the [Boost Software Licence V1.0](http://www.boost.or
 
 Currently implemented
 ---------------------
+* Breadth First Search
+* Depth Limited Search
 * Uniform Cost Search
 
 Dependencies

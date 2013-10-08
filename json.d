@@ -112,8 +112,11 @@ unittest
         }
     }
 
-    auto n1 = find!("a.name == \"1055\"")(g.nodes);
-    auto n2 = find!("a.name == \"547\"")(g.nodes);
+    //auto n1 = find!("a.name == \"1055\"")(g.nodes);
+    //auto n2 = find!("a.name == \"547\"")(g.nodes);
+
+    auto n1 = find!("a.name == \"1741\"")(g.nodes);
+    auto n2 = find!("a.name == \"1957\"")(g.nodes);
 
 
     StopWatch sw;
@@ -162,7 +165,7 @@ unittest
 
     auto dls = new DepthLimitedSearch(g, n1[0], n2[0]);
 
-    for (ulong i = 0; i <= 10000; i += 100)
+    for (ulong i = 0; i <= 10000; i += 500)
     {
         auto dlsResult = dls.run(i);
 

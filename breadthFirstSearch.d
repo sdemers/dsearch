@@ -41,7 +41,7 @@ class BreadthFirstSearch
         {
             auto be1 = cast(BreadthFirstSearchEdge)e1;
             auto be2 = cast(BreadthFirstSearchEdge)e2;
-            return be1.depth < be2.depth;
+            return be1.depth <= be2.depth;
         }
 
         ISearchEdgeContainer frontier = new FixedArrayContainer(m_graph.edges.length, &shallowest);

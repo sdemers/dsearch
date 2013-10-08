@@ -16,7 +16,6 @@ import std.json;
 import std.conv;
 import std.file;
 import std.algorithm;
-import std.datetime;
 
 /**
     Load JSON. Reads a JSON file and return the resulting Graph.
@@ -93,100 +92,6 @@ public auto loadJSON(const string filename)
     return graph;
 }
 
-
 unittest
 {
-    import dsearch.uniformCostSearch;
-    import dsearch.depthLimitedSearch;
-    import dsearch.breadthFirstSearch;
-
-    writeln("Begin JSON test");
-
-    Graph g = loadJSON("data/lines.json");
-
-    debug
-    {
-        foreach (const Node n; g.nodes)
-        {
-            writefln("%.2f, %.2f |", n.pos.x, n.pos.y);
-        }
-    }
-
-    //auto n1 = find!("a.name == \"1055\"")(g.nodes);
-    //auto n2 = find!("a.name == \"547\"")(g.nodes);
-
-    auto n1 = find!("a.name == \"1741\"")(g.nodes);
-    auto n2 = find!("a.name == \"1957\"")(g.nodes);
-
-
-    StopWatch sw;
-    sw.start();
-
-    writeln("Uniform Cost Search -------------------------------");
-
-    auto ucs = new UniformCostSearch(g, n1[0], n2[0]);
-    auto ucsResult = ucs.run();
-
-	debug
-	{
-        writeln("JSON result:");
-		foreach (const Edge e; ucsResult)
-		{
-			writefln("%.2f, %.2f", e.node2.pos.x, e.node2.pos.y);
-		}
-	}
-
-    sw.stop();
-    writefln("Time elapsed: %s msec", sw.peek().msecs);
-    sw.reset();
-
-    writeln("Breadth First Search -------------------------------");
-
-    sw.start();
-    auto bfs = new BreadthFirstSearch(g, n1[0], n2[0]);
-    auto bfsResult = bfs.run();
-
-	debug
-	{
-        writeln("JSON result:");
-		foreach (const Edge e; bfsResult)
-		{
-			writefln("%.2f, %.2f", e.node2.pos.x, e.node2.pos.y);
-		}
-	}
-
-    sw.stop();
-    writefln("Time elapsed: %s msec", sw.peek().msecs);
-    sw.reset();
-
-    writeln("Depth Limited Search -------------------------------");
-
-    sw.start();
-
-    auto dls = new DepthLimitedSearch(g, n1[0], n2[0]);
-
-    for (ulong i = 0; i <= 10000; i += 500)
-    {
-        auto dlsResult = dls.run(i);
-
-        writefln("DepthLimitedSearch found a path: %s, limit: %d", dlsResult.length == 0 ? "false" : "true", i);
-
-        if (dlsResult.length > 0)
-        {
-            debug
-            {
-                writeln("DepthLimitedSearch result:");
-                foreach (const Edge e; dlsResult)
-                {
-                    writefln("%.2f, %.2f", e.node2.pos.x, e.node2.pos.y);
-                }
-            }
-            break;
-        }
-    }
-
-    sw.stop();
-    writefln("Time elapsed: %s msec", sw.peek().msecs);
-
-    writeln("End JSON test");
 }
